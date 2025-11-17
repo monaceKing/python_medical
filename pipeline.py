@@ -3,10 +3,9 @@ from corrections.attenuation import attenuation_correction
 from corrections.movement import register_images
 
 def process_image(
-    ref_path,
-    mov_path=None,
+    paths,
     apply_attenuation=True,
-    apply_motion=True, 
+    apply_motion=True,
     config=None
 ):
     """
@@ -34,20 +33,64 @@ def process_image(
         Image corrigée du mouvement
     """
 
-    # 1) Chargement de l’image principale
-    img_ref, meta_ref = load_dicom(ref_path)
+    # NORMALISATION DE L'ENTRÉE
+    if isinstance(paths, str):
+        paths = [paths]              # 1 seule image
+    elif isinstance(paths, list):
+        if len(paths) == 0:
+            raise ValueError("Aucune image fournie.")
+    else:
+        raise TypeError("paths doit être un str ou une liste de chemins DICOM.")
 
-    # 2) Correction d’atténuation
-    if apply_attenuation:
-        img_ref = attenuation_correction(img_ref, config)
+    # CAS 1 : une seule image → pas de correction de mouvement
+    if len(paths) == 1:
+        img, _ = load_dicom(paths[0])
 
-    # 3) Correction de mouvement (si deuxième image fournie)
-    aligned = None
-    if apply_motion and mov_path is not None:
-        aligned = register_images(ref_path, mov_path, config)
-
-        # Si atténuation activée → appliquer aussi sur l’image alignée
         if apply_attenuation:
-            aligned = attenuation_correction(aligned, config)
+            img = attenuation_correction(img, config)
 
-    return img_ref, aligned
+        return img, None   # (image corrigée, pas d’image alignée)
+
+    # CAS 2 : deux images → correction mouvement possible
+    elif len(paths) == 2:
+        ref_path = paths[0]
+        mov_path = paths[1]
+
+        img_ref, _ = load_dicom(ref_path)
+
+        # Correction atténuation sur ref
+        if apply_attenuation:
+            img_ref = attenuation_correction(img_ref, config)
+
+        aligned = None
+        if apply_motion:
+            aligned = register_images(ref_path, mov_path, config)
+
+            if aligned is not None and apply_attenuation:
+                aligned = attenuation_correction(aligned, config)
+
+        return img_ref, aligned
+
+    # CAS 3 : plusieurs images → série dynamique
+    else:
+        ref_path = paths[0]
+        img_ref, _ = load_dicom(ref_path)
+
+        if apply_attenuation:
+            img_ref = attenuation_correction(img_ref, config)
+
+        aligned_list = []
+
+        # traiter les images suivantes
+        for mov_path in paths[1:]:
+            aligned = None
+
+            if apply_motion:
+                aligned = register_images(ref_path, mov_path, config)
+
+                if aligned is not None and apply_attenuation:
+                    aligned = attenuation_correction(aligned, config)
+
+            aligned_list.append(aligned)
+
+        return img_ref, aligned_list
