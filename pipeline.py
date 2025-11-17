@@ -6,7 +6,7 @@ def process_image(
     ref_path,
     mov_path=None,
     apply_attenuation=True,
-    apply_motion=True,
+    apply_motion=True, 
     config=None
 ):
     """
