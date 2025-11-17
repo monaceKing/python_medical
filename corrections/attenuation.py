@@ -2,9 +2,9 @@ import numpy as np
 
 def attenuation_correction(image, config):
     """
-    Correction d’atténuation simple basée sur un modèle exponentiel.
+    Correction d'atténuation simple basée sur un modèle exponentiel.
     Formule utilisée :
-        I_corrigée = I_observée × exp(μ × profondeur)
+        I_corrigée = I_observée x exp(μ x profondeur)
 
     Paramètres:
     -----------

@@ -1,0 +1,26 @@
+# Environnements virtuels Python
+venv/
+env/
+ENV/
+.venv/
+
+# Fichiers Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+
+# Système
+.DS_Store
+Thumbs.db
