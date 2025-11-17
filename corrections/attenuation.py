@@ -20,7 +20,7 @@ def attenuation_correction(image, config):
     corrected : np.ndarray
         Image corrigée et normalisée.
     """
-
+ 
     # Récupération des paramètres
     mu = config.get("mu", 0.15)       # Coefficient d'atténuation par défaut
     depth = config.get("depth", 12.0) # Profondeur moyenne du patient
