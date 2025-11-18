@@ -15,26 +15,45 @@ from config import config
 import matplotlib.pyplot as plt
 import os
 
+# ⭐ CHEMINS RELATIFS - Plus besoin de modifier les chemins !
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+IMAGES_DIR = os.path.join(BASE_DIR, "images")
+
 # -------------------------------------------------------------
 # UTILISATEUR : définissez ici vos images DICOM
 # -------------------------------------------------------------
 
 # 1 seule image
-single_image = r"C:\python_medical\images\frame1.dcm"
+single_image = os.path.join(IMAGES_DIR, "frame1.dcm")
 
 # 2 images (correction du mouvement)
-ref = r"C:\python_medical\images\frame1.dcm"
-mov = r"C:\python_medical\images\frame2.dcm"
+ref = os.path.join(IMAGES_DIR, "frame1.dcm")
+mov = os.path.join(IMAGES_DIR, "frame2.dcm")
 
 # Plusieurs images (série dynamique)
 multi_images = [
-    r"C:\python_medical\images\frame1.dcm",
-    r"C:\python_medical\images\frame2.dcm",
-    r"C:\python_medical\images\frame3.dcm"
+    os.path.join(IMAGES_DIR, "frame1.dcm"),
+    os.path.join(IMAGES_DIR, "frame2.dcm"),
+    os.path.join(IMAGES_DIR, "frame3.dcm")
 ]
 
+# Vérification des fichiers
+def check_files_exist():
+    """Vérifie que tous les fichiers DICOM existent"""
+    all_files = [single_image, ref, mov] + multi_images
+    for filepath in set(all_files):  # set() pour éviter les doublons
+        if not os.path.exists(filepath):
+            print(f"❌ ERREUR : Fichier introuvable : {filepath}")
+            print(f"📁 Dossier images : {IMAGES_DIR}")
+            print(f"📄 Fichiers disponibles : {os.listdir(IMAGES_DIR) if os.path.exists(IMAGES_DIR) else 'Dossier inexistant'}")
+            exit(1)
+    print("✅ Tous les fichiers DICOM ont été trouvés")
+
+# Vérification avant de commencer
+check_files_exist()
+
 # -------------------------------------------------------------
-# EXÉCUTION 1 : TRAITEMENT D’UNE SEULE IMAGE
+# EXÉCUTION 1 : TRAITEMENT D'UNE SEULE IMAGE
 # -------------------------------------------------------------
 
 print("\n--- TRAITEMENT : 1 seule image ---")
